@@ -1,4 +1,4 @@
-#import tkinter as tk
+import tkinter as tk
 import random
 
 
@@ -7,7 +7,19 @@ import random
 ####################################################################################################
 
 
+# def verb_type(verb):
+#     if verb.endswith("ar"):
+#         return "ar"
+#     if verb.endswith("er"):
+#         return "er"
+#     if verb.endswith("ir"):
+#         return "ir"
+
+#     raise ValueError(f"Type de verbe inconnu : {verb}")
+
 def verb_type(verb):
+    if verb == "oír":
+        return "ir"
     if verb.endswith("ar"):
         return "ar"
     if verb.endswith("er"):
@@ -557,6 +569,14 @@ PRESENT_IRREGULAR = {
 "vosotros": "dais",
 "ellos": "dan",
 },
+"oír": {
+    "yo": "oigo",
+    "tu": "oyes",
+    "el": "oye",
+    "nosotros": "oímos",
+    "vosotros": "oís",
+    "ellos": "oyen",
+},
 }
 
 
@@ -746,6 +766,13 @@ def apply_present_orthographic_rules(verb, person, stem):
 
         return stem
 
+    # ------------------------------------------------------------------
+    # -uir -> -uyo, -uyes, -uye, -uyen
+    # construir -> construyo, construyes, construye, construyen
+    # ------------------------------------------------------------------
+
+
+
     return stem
 
 
@@ -875,6 +902,24 @@ def conjugate_present(verb, person):
     if verb in VERBS_EIR_ACCENT:
         return conjugate_present_eir(verb, person)
 
+
+        # Verbes en -uir : presente avec y
+    if verb in VERBS_UIR_Y:
+        stem = verb[:-2]
+
+        if person == "yo":
+            return stem + "yo"
+        if person == "tu":
+            return stem + "yes"
+        if person == "el":
+            return stem + "ye"
+        if person == "ellos":
+            return stem + "yen"
+        if person == "nosotros":
+            return stem + "imos"
+        if person == "vosotros":
+            return stem + "ís"
+        
     # --------------------------------------------------------------------------------------------
     # ÉTAPE 3
     # Base régulière
@@ -928,97 +973,6 @@ def conjugate_present(verb, person):
 
 
 
-
-
-
-# def apply_present_stem_change(verb, person):
-#     if person in ("nosotros", "vosotros"):
-#         return verb
-
-#     if verb in STEM_E_IE:
-#         return verb[:-2].replace("e", "ie") + verb[-2:]
-
-#     if verb in STEM_O_UE:
-#         return verb[:-2].replace("o", "ue") + verb[-2:]
-
-#     if verb in STEM_U_UE:
-#         return verb[:-2].replace("u", "ue") + verb[-2:]
-
-#     if verb in STEM_E_I:
-#         return verb[:-2].replace("e", "i") + verb[-2:]
-
-#     return verb
-
-
-# def conjugate_present(verb, person):
-#     if verb in PRESENT_IRREGULAR:
-#         return PRESENT_IRREGULAR[verb][person]
-
-#     stem = verb[:-2]
-
-#     # --------------------------------------------------------
-#     # Formes YO particulières
-#     # --------------------------------------------------------
-
-#     if person == "yo":
-
-#         if verb == "seguir":
-#             return "sigo"
-
-#         if verb == "conseguir":
-#             return "consigo"
-
-#     # --------------------------------------------------------
-#     # Changements de radical
-#     # --------------------------------------------------------
-
-#     if person not in ("nosotros", "vosotros"):
-
-#         if verb in STEM_E_IE:
-#             pos = stem.rfind("e")
-
-#             if pos != -1:
-#                 stem = stem[:pos] + "ie" + stem[pos + 1:]
-
-#         elif verb in STEM_O_UE:
-#             pos = stem.rfind("o")
-
-#             if pos != -1:
-#                 stem = stem[:pos] + "ue" + stem[pos + 1:]
-
-#         elif verb in STEM_U_UE:
-#             pos = stem.rfind("u")
-
-#             if pos != -1:
-#                 stem = stem[:pos] + "ue" + stem[pos + 1:]
-
-#         elif verb in STEM_E_I:
-#             pos = stem.rfind("e")
-
-#             if pos != -1:
-#                 stem = stem[:pos] + "i" + stem[pos + 1:]
-
-#     # --------------------------------------------------------
-#     # Autres irrégularités orthographiques en YO
-#     # --------------------------------------------------------
-
-#     if person == "yo":
-
-#         if verb.endswith("ocer"):
-#             return stem + "ozco"
-
-#         if verb.endswith("ucir"):
-#             return stem + "uzco"
-
-#         if verb.endswith("ger"):
-#             return stem[:-1] + "jo"
-
-#         if verb.endswith("gir"):
-#             return stem[:-1] + "jo"
-
-#     ending = PRESENT_ENDINGS[verb_type(verb)][person]
-
-#     return stem + ending
     
 
 
@@ -2192,7 +2146,7 @@ def apply_subjunctive_present_uir_rule(verb, stem):
     """
 
     if verb.endswith("uir") and not verb.endswith("guir"):
-        return stem + "y"
+        return stem #+ "y"
 
     return stem
 
@@ -2401,99 +2355,6 @@ def conjugate_subjunctive_pluperfect(verb, person):
 ############################################ IMPERATIVE ############################################
 ####################################################################################################
 
-
-
-# IMPERATIVE_AFFIRMATIVE_IRREGULAR = {
-# "tener": {
-# "tu": "ten",
-# },
-# "venir": {
-# "tu": "ven",
-# },
-# "decir": {
-# "tu": "di",
-# },
-# "hacer": {
-# "tu": "haz",
-# },
-# "ir": {
-# "tu": "ve",
-# },
-# "poner": {
-# "tu": "pon",
-# },
-# "salir": {
-# "tu": "sal",
-# },
-# "ser": {
-# "tu": "sé",
-# },
-# }
-
-
-
-# IMPERATIVE_PERSONS = [
-# "tu",
-# "el",
-# "nosotros",
-# "vosotros",
-# "ellos",
-# ]
-
-
-# def conjugate_imperative_affirmative(verb, person):
-
-#     if person == "tu":
-
-#         if verb in IMPERATIVE_AFFIRMATIVE_IRREGULAR:
-#             return IMPERATIVE_AFFIRMATIVE_IRREGULAR[verb]["tu"]
-
-#         # Pour tú, l'impératif affirmatif régulier
-#         # correspond à la 3e personne du singulier du présent
-#         return conjugate_present(verb, "el")
-
-#     if person == "el":
-#         # usted → présent du subjonctif
-#         return conjugate_subjunctive_present(verb, "el")
-
-#     if person == "nosotros":
-#         # nosotros → subjonctif présent
-#         return conjugate_subjunctive_present(verb, "nosotros")
-
-#     if person == "vosotros":
-#         # Impératif affirmatif vosotros :
-#         # infinitif sans le "r" final + "d"
-#         #
-#         # hablar -> hablad
-#         # comer  -> comed
-#         # vivir  -> vivid
-#         return verb[:-1] + "d"
-
-#     if person == "ellos":
-#         # ustedes → subjonctif présent
-#         return conjugate_subjunctive_present(verb, "ellos")
-
-#     raise ValueError(f"Personne inconnue : {person}")
-
-
-# def conjugate_imperative_negative(verb, person):
-
-#     if person == "tu":
-#         return "no " + conjugate_subjunctive_present(verb, "tu")
-
-#     if person == "el":
-#         return "no " + conjugate_subjunctive_present(verb, "el")
-
-#     if person == "nosotros":
-#         return "no " + conjugate_subjunctive_present(verb, "nosotros")
-
-#     if person == "vosotros":
-#         return "no " + conjugate_subjunctive_present(verb, "vosotros")
-
-#     if person == "ellos":
-#         return "no " + conjugate_subjunctive_present(verb, "ellos")
-
-#     raise ValueError(f"Personne inconnue : {person}")
 
 
 IMPERATIVE_AFFIRMATIVE_IRREGULAR = {
